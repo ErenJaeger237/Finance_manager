@@ -1,0 +1,38 @@
+# Build Artifacts
+.gradle/
+build/
+app/build/
+*.apk
+*.ap_
+*.dex
+*.class
+
+# IDE - Android Studio / IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+.navigation/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+
+# Secrets & Sensitive Data
+*.keystore
+*.jks
+*.p12
+google-services.json
+.env
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Documentation & Plan Files (Requested)
+implementation_plan.md
+CLAUDE.md
+BUILD_MEMORY.md
+
+# Log files
+*.log
