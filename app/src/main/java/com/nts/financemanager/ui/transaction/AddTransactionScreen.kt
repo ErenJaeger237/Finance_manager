@@ -1,20 +1,25 @@
 package com.nts.financemanager.ui.transaction
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.nts.financemanager.data.model.TransactionType
+import com.nts.financemanager.ui.theme.ExpenseRed
+import com.nts.financemanager.ui.theme.IncomeGreen
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -41,148 +46,189 @@ fun AddTransactionScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Text(
-            text = "Add Transaction",
+            text = "New Transaction",
             style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
-        // ── Income / Expense Toggle ───────────────
-        Row(
+        // ── 1. Income/Expense Toggle Card ─────────────────
+        Card(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-            FilterChip(
-                modifier = Modifier.weight(1f),
-                selected = type == TransactionType.EXPENSE,
-                onClick = { viewModel.formType.value = TransactionType.EXPENSE },
-                label = { Text("Expense") }
-            )
-            FilterChip(
-                modifier = Modifier.weight(1f),
-                selected = type == TransactionType.INCOME,
-                onClick = { viewModel.formType.value = TransactionType.INCOME },
-                label = { Text("Income") }
-            )
-        }
-
-        // ── Title ─────────────────────────────────
-        OutlinedTextField(
-            value = title,
-            onValueChange = { viewModel.formTitle.value = it },
-            label = { Text("Title") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-
-        // ── Amount ────────────────────────────────
-        OutlinedTextField(
-            value = amount,
-            onValueChange = { viewModel.formAmount.value = it },
-            label = { Text("Amount (FCFA)") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
-
-        // ── Category Dropdown ─────────────────────
-        ExposedDropdownMenuBox(
-            expanded = categoryExpanded,
-            onExpandedChange = { categoryExpanded = it }
-        ) {
-            OutlinedTextField(
-                value = category,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Category") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-            )
-            ExposedDropdownMenu(
-                expanded = categoryExpanded,
-                onDismissRequest = { categoryExpanded = false }
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                categories.categories.forEach { cat ->
-                    DropdownMenuItem(
-                        text = { Text(cat.name) },
-                        onClick = {
-                            viewModel.formCategory.value = cat.name
-                            categoryExpanded = false
-                        }
-                    )
+                val expenseSelected = type == TransactionType.EXPENSE
+                val incomeSelected = type == TransactionType.INCOME
+
+                Button(
+                    onClick = { viewModel.formType.value = TransactionType.EXPENSE },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (expenseSelected) ExpenseRed else Color.Transparent,
+                        contentColor = if (expenseSelected) Color.White else ExpenseRed
+                    ),
+                    elevation = null
+                ) {
+                    Text("Expense", fontWeight = FontWeight.Bold)
                 }
-                // Add custom category option
-                HorizontalDivider()
-                DropdownMenuItem(
-                    text = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Add Custom Category")
+
+                Button(
+                    onClick = { viewModel.formType.value = TransactionType.INCOME },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (incomeSelected) IncomeGreen else Color.Transparent,
+                        contentColor = if (incomeSelected) Color.White else IncomeGreen
+                    ),
+                    elevation = null
+                ) {
+                    Text("Income", fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+
+        // ── 2. Main Details Card ─────────────────────────
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Amount Input (BIG Focus)
+                OutlinedTextField(
+                    value = amount,
+                    onValueChange = { viewModel.formAmount.value = it },
+                    label = { Text("Amount (FCFA)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = if (type == TransactionType.EXPENSE) ExpenseRed else IncomeGreen
+                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true
+                )
+
+                // Title Input
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { viewModel.formTitle.value = it },
+                    label = { Text("What is this for?") },
+                    modifier = Modifier.fillMaxWidth(),
+                    leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true
+                )
+
+                // Category Dropdown
+                ExposedDropdownMenuBox(
+                    expanded = categoryExpanded,
+                    onExpandedChange = { categoryExpanded = it }
+                ) {
+                    OutlinedTextField(
+                        value = category,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Category") },
+                        leadingIcon = { Icon(Icons.Default.Category, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },
+                        modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    ExposedDropdownMenu(
+                        expanded = categoryExpanded,
+                        onDismissRequest = { categoryExpanded = false }
+                    ) {
+                        categories.categories.forEach { cat ->
+                            DropdownMenuItem(
+                                text = { Text(cat.name) },
+                                onClick = {
+                                    viewModel.formCategory.value = cat.name
+                                    categoryExpanded = false
+                                }
+                            )
+                        }
+                        HorizontalDivider()
+                        DropdownMenuItem(
+                            text = { Text("Add Custom...", color = MaterialTheme.colorScheme.primary) },
+                            onClick = {
+                                categoryExpanded = false
+                                showAddCategoryDialog = true
+                            }
+                        )
+                    }
+                }
+
+                // Date Picker Input
+                OutlinedTextField(
+                    value = dateFormat.format(Date(date)),
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Date") },
+                    leadingIcon = { Icon(Icons.Default.CalendarToday, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                    trailingIcon = {
+                        IconButton(onClick = { showDatePicker = true }) {
+                            Icon(Icons.Default.DateRange, contentDescription = "Select date")
                         }
                     },
-                    onClick = {
-                        categoryExpanded = false
-                        showAddCategoryDialog = true
-                    }
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                // Note Input
+                OutlinedTextField(
+                    value = note,
+                    onValueChange = { viewModel.formNote.value = it },
+                    label = { Text("Add a note (optional)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    minLines = 2
                 )
             }
         }
 
-        // ── Date Picker ───────────────────────────
-        OutlinedTextField(
-            value = dateFormat.format(Date(date)),
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Date") },
-            trailingIcon = {
-                IconButton(onClick = { showDatePicker = true }) {
-                    Icon(Icons.Default.DateRange, contentDescription = "Select date")
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // ── Note (Optional) ──────────────────────
-        OutlinedTextField(
-            value = note,
-            onValueChange = { viewModel.formNote.value = it },
-            label = { Text("Note (optional)") },
-            modifier = Modifier.fillMaxWidth(),
-            minLines = 2,
-            maxLines = 3
-        )
-
-        // ── Save Button ──────────────────────────
+        // ── 3. Save Action ───────────────────────────────
         Button(
             onClick = { viewModel.saveTransaction(onTransactionSaved) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(16.dp),
             enabled = title.isNotBlank() && amount.isNotBlank() && category.isNotBlank()
         ) {
-            Text("Save Transaction", modifier = Modifier.padding(vertical = 4.dp))
+            Text("Save Transaction", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         }
 
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(40.dp))
     }
 
-    // ── Date Picker Dialog ────────────────────────
+    // [DIALOGS REMAIN THE SAME BUT THEMED IN THEME.KT]
     if (showDatePicker) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = date
-        )
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = date)
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let {
-                        viewModel.formDate.value = it
-                    }
+                    datePickerState.selectedDateMillis?.let { viewModel.formDate.value = it }
                     showDatePicker = false
                 }) { Text("OK") }
             },
@@ -194,7 +240,6 @@ fun AddTransactionScreen(
         }
     }
 
-    // ── Add Category Dialog ───────────────────────
     if (showAddCategoryDialog) {
         var newCategoryName by remember { mutableStateOf("") }
         AlertDialog(
@@ -205,7 +250,8 @@ fun AddTransactionScreen(
                     value = newCategoryName,
                     onValueChange = { newCategoryName = it },
                     label = { Text("Category name") },
-                    singleLine = true
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
                 )
             },
             confirmButton = {

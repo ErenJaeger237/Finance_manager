@@ -1,20 +1,23 @@
 package com.nts.financemanager.ui.budget
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.nts.financemanager.data.model.Budget
 import com.nts.financemanager.ui.theme.ExpenseRed
 import com.nts.financemanager.ui.theme.IncomeGreen
 import com.nts.financemanager.ui.theme.WarningOrange
@@ -28,31 +31,38 @@ fun BudgetScreen(viewModel: BudgetViewModel) {
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { showAddDialog = true }) {
+            FloatingActionButton(
+                onClick = { showAddDialog = true },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = Color.White,
+                shape = RoundedCornerShape(16.dp)
+            ) {
                 Icon(Icons.Default.Add, contentDescription = "Set Budget")
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(paddingValues),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                Text(
-                    text = "Budget",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                Text(
-                    text = uiState.currentMonth,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = "Budgets",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Manage your limits for ${uiState.currentMonth}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
             if (uiState.budgets.isEmpty()) {
@@ -60,14 +70,18 @@ fun BudgetScreen(viewModel: BudgetViewModel) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(48.dp),
+                            .padding(top = 80.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "No budgets set.\nTap + to add one.",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Default.AccountBalanceWallet, contentDescription = null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.surfaceVariant)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "No budgets set yet.",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             } else {
@@ -79,79 +93,98 @@ fun BudgetScreen(viewModel: BudgetViewModel) {
 
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = when {
-                                isExceeded -> MaterialTheme.colorScheme.errorContainer
-                                isWarning -> MaterialTheme.colorScheme.tertiaryContainer
-                                else -> MaterialTheme.colorScheme.surfaceVariant
-                            }
-                        )
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
+                        Column(modifier = Modifier.padding(20.dp)) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.Top
                             ) {
-                                Column {
+                                Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         text = budget.category,
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.SemiBold
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.Bold
                                     )
-                                    Text(
-                                        text = "${CurrencyFormatter.format(spent)} / ${CurrencyFormatter.format(budget.limitAmount)}",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            text = CurrencyFormatter.format(spent),
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isExceeded) ExpenseRed else MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Text(
+                                            text = " / ${CurrencyFormatter.format(budget.limitAmount)}",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
                                 }
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    if (isWarning) {
-                                        Icon(
-                                            Icons.Default.Warning,
-                                            contentDescription = "Warning",
-                                            tint = if (isExceeded) ExpenseRed else WarningOrange,
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                    }
-                                    IconButton(onClick = { viewModel.deleteBudget(budget) }) {
-                                        Icon(
-                                            Icons.Default.Delete,
-                                            contentDescription = "Delete budget",
-                                            tint = MaterialTheme.colorScheme.error
-                                        )
-                                    }
+                                
+                                IconButton(onClick = { viewModel.deleteBudget(budget) }) {
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = "Delete",
+                                        tint = MaterialTheme.colorScheme.error.copy(alpha = 0.5f),
+                                        modifier = Modifier.size(20.dp)
+                                    )
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                            LinearProgressIndicator(
-                                progress = { ratio.toFloat().coerceIn(0f, 1f) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(8.dp),
-                                color = when {
-                                    isExceeded -> ExpenseRed
-                                    isWarning -> WarningOrange
-                                    else -> IncomeGreen
-                                },
-                                trackColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
+                            // Custom Progress Bar
+                            val barColor = when {
+                                isExceeded -> ExpenseRed
+                                isWarning -> WarningOrange
+                                else -> IncomeGreen
+                            }
 
-                            if (isExceeded) {
-                                Text(
-                                    text = "Budget exceeded by ${CurrencyFormatter.format(spent - budget.limitAmount)}",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = ExpenseRed,
-                                    modifier = Modifier.padding(top = 4.dp)
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                LinearProgressIndicator(
+                                    progress = { ratio.toFloat().coerceIn(0f, 1f) },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(10.dp)
+                                        .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(5.dp))
+                                        .padding(1.dp), // subtle inset
+                                    color = barColor,
+                                    trackColor = Color.Transparent, // handled by box background
+                                    strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
                                 )
+                                
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    val percentage = (ratio * 100).toInt()
+                                    Text(
+                                        text = "$percentage% used",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Medium,
+                                        color = barColor
+                                    )
+                                    
+                                    if (isExceeded) {
+                                        Text(
+                                            text = "Exceeded by ${CurrencyFormatter.format(spent - budget.limitAmount)}",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = ExpenseRed
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
-
+            
             item { Spacer(modifier = Modifier.height(80.dp)) }
         }
     }
@@ -164,9 +197,9 @@ fun BudgetScreen(viewModel: BudgetViewModel) {
 
         AlertDialog(
             onDismissRequest = { showAddDialog = false },
-            title = { Text("Set Budget") },
+            title = { Text("Set Category Budget", fontWeight = FontWeight.Bold) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     ExposedDropdownMenuBox(
                         expanded = categoryExpanded,
                         onExpandedChange = { categoryExpanded = it }
@@ -175,9 +208,10 @@ fun BudgetScreen(viewModel: BudgetViewModel) {
                             value = selectedCategory,
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Category") },
+                            label = { Text("Choose Category") },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },
-                            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                            modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                            shape = RoundedCornerShape(12.dp)
                         )
                         ExposedDropdownMenu(
                             expanded = categoryExpanded,
@@ -198,22 +232,25 @@ fun BudgetScreen(viewModel: BudgetViewModel) {
                     OutlinedTextField(
                         value = limitText,
                         onValueChange = { limitText = it },
-                        label = { Text("Budget Limit (FCFA)") },
+                        label = { Text("Limit (FCFA)") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             },
             confirmButton = {
-                TextButton(
+                Button(
                     onClick = {
                         val limit = limitText.toDoubleOrNull()
                         if (limit != null && selectedCategory.isNotBlank()) {
                             viewModel.saveBudget(selectedCategory, limit)
                             showAddDialog = false
                         }
-                    }
-                ) { Text("Save") }
+                    },
+                    shape = RoundedCornerShape(12.dp)
+                ) { Text("Save Limit") }
             },
             dismissButton = {
                 TextButton(onClick = { showAddDialog = false }) { Text("Cancel") }

@@ -2,42 +2,32 @@ package com.nts.financemanager.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ── Primary: Olive Green ──────────────────────────────
+// ── Primary Design System (Fintech Style) ──────────────────
 val OliveGreen = Color(0xFF6B8E23)
-val OliveGreenLight = Color(0xFF8FBC3E)
-val OliveGreenDark = Color(0xFF4A6310)
+val BackgroundGray = Color(0xFFF5F5F5)
+val DarkText = Color(0xFF222222)
+val SecondaryText = Color(0xFF757575)
 
-// ── Light Theme ───────────────────────────────────────
+// ── Financial Accents ──────────────────────────────────────
+val IncomeGreen = Color(0xFF43A047)
+val ExpenseRed = Color(0xFFE53935)
+val WarningOrange = Color(0xFFFB8C00)
+
+// ── Material 3 Color Scheme Mapping ────────────────────────
 val LightPrimary = OliveGreen
 val LightOnPrimary = Color.White
-val LightPrimaryContainer = Color(0xFFD4E8A0)
-val LightOnPrimaryContainer = Color(0xFF1A2800)
+val LightPrimaryContainer = Color(0xFFE8F5E9)
+val LightOnPrimaryContainer = Color(0xFF2E7D32)
+
 val LightSecondary = Color(0xFF57624A)
-val LightOnSecondary = Color.White
-val LightSecondaryContainer = Color(0xFFDBE7C8)
-val LightBackground = Color(0xFFFDFDF5)
-val LightOnBackground = Color(0xFF1A1C18)
+val LightBackground = BackgroundGray
 val LightSurface = Color.White
-val LightOnSurface = Color(0xFF1A1C18)
-val LightSurfaceVariant = Color(0xFFE1E4D5)
-val LightError = Color(0xFFBA1A1A)
+val LightOnSurface = DarkText
+val LightSurfaceVariant = Color(0xFFEEEEEE)
+val LightError = ExpenseRed
 
-// ── Dark Theme ────────────────────────────────────────
+// ── Dark Theme (Muted for Eye Comfort) ─────────────────────
+val DarkBackground = Color(0xFF121212)
+val DarkSurface = Color(0xFF1E1E1E)
+val DarkOnSurface = Color(0xFFE0E0E0)
 val DarkPrimary = Color(0xFFB5D46E)
-val DarkOnPrimary = Color(0xFF263500)
-val DarkPrimaryContainer = Color(0xFF3B4F00)
-val DarkOnPrimaryContainer = Color(0xFFD4E8A0)
-val DarkSecondary = Color(0xFFBFCBAD)
-val DarkOnSecondary = Color(0xFF2A331F)
-val DarkSecondaryContainer = Color(0xFF404A34)
-val DarkBackground = Color(0xFF121410)
-val DarkOnBackground = Color(0xFFE3E3DA)
-val DarkSurface = Color(0xFF1A1C18)
-val DarkOnSurface = Color(0xFFE3E3DA)
-val DarkSurfaceVariant = Color(0xFF44483D)
-val DarkError = Color(0xFFFFB4AB)
-
-// ── Financial Accent Colors ───────────────────────────
-val IncomeGreen = Color(0xFF2E7D32)
-val ExpenseRed = Color(0xFFC62828)
-val WarningOrange = Color(0xFFEF6C00)
