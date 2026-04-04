@@ -109,7 +109,8 @@ fun FinanceNavHost(
                         navController.navigate(Screen.Dashboard.route) {
                             popUpTo(Screen.Dashboard.route) { inclusive = true }
                         }
-                    }
+                    },
+                    onBack = { navController.popBackStack() }
                 )
             }
             composable(Screen.Transactions.route) {

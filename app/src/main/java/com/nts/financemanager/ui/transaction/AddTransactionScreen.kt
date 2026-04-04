@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,7 +26,8 @@ import java.util.*
 @Composable
 fun AddTransactionScreen(
     viewModel: TransactionViewModel,
-    onTransactionSaved: () -> Unit
+    onTransactionSaved: () -> Unit,
+    onBack: () -> Unit
 ) {
     val uiState by viewModel.listUiState.collectAsState()
     val title by viewModel.formTitle.collectAsState()
@@ -49,6 +51,11 @@ fun AddTransactionScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("New Entry", fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
                 scrollBehavior = scrollBehavior
             )
         }
@@ -237,6 +244,7 @@ fun AddTransactionScreen(
                 Text("Confirm Entry", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             }
 
+            // Spacer for bottom navigation / FAB safety
             Spacer(modifier = Modifier.height(40.dp))
         }
     }

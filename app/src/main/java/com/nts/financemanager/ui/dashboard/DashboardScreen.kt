@@ -103,11 +103,11 @@ fun DashboardScreen(
                 )
             },
             floatingActionButton = {
-                LargeFloatingActionButton(
+                FloatingActionButton(
                     onClick = onAddTransaction,
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
-                    shape = MaterialTheme.shapes.extraLarge
+                    shape = MaterialTheme.shapes.large
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add Transaction")
                 }
