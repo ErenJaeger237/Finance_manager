@@ -15,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -23,8 +24,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nts.financemanager.util.CurrencyFormatter
-import com.patrykandpatrick.vico.compose.cartesian.*
-import com.patrykandpatrick.vico.compose.cartesian.layer.*
+import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
+import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
 import com.nts.financemanager.ui.theme.glassmorphic
 import com.nts.financemanager.ui.theme.neomorphic
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
@@ -52,19 +58,23 @@ fun DashboardScreen(
         }
     }
 
+    // Pre-calculate colors for Canvas to avoid @Composable calls in DrawScope
+    val primaryGlow = MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
+    val tertiaryGlow = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f)
+
     // Wrap in Box to add background gradients for true Glassmorphism
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         // Dynamic background glows for glassmorphism refraction
-        androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize().androidx.compose.ui.draw.blur(80.dp)) {
+        androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize().blur(80.dp)) {
             val canvasWidth = size.width
             val canvasHeight = size.height
             drawCircle(
-                color = viewModel.uiState.value.let { MaterialTheme.colorScheme.primary.copy(alpha = 0.25f) },
+                color = primaryGlow,
                 radius = canvasWidth * 0.7f,
                 center = androidx.compose.ui.geometry.Offset(canvasWidth, 0f)
             )
             drawCircle(
-                color = viewModel.uiState.value.let { MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f) },
+                color = tertiaryGlow,
                 radius = canvasWidth * 0.6f,
                 center = androidx.compose.ui.geometry.Offset(0f, canvasHeight)
             )
@@ -115,16 +125,16 @@ fun DashboardScreen(
                         title = "Inflow",
                         amount = uiState.totalIncome,
                         icon = Icons.AutoMirrored.Filled.TrendingUp,
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.primary
                     )
                     SmallSummaryCard(
                         modifier = Modifier.weight(1f),
                         title = "Outflow",
                         amount = uiState.totalExpense,
                         icon = Icons.AutoMirrored.Filled.TrendingDown,
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.error
                     )
                 }
             }
@@ -153,7 +163,9 @@ fun DashboardScreen(
                         Box(modifier = Modifier.padding(16.dp)) {
                             CartesianChartHost(
                                 chart = rememberCartesianChart(
-                                    rememberColumnCartesianLayer(), // Simplified for stability
+                                    rememberColumnCartesianLayer(),
+                                    startAxis = VerticalAxis.rememberStart(),
+                                    bottomAxis = HorizontalAxis.rememberBottom()
                                 ),
                                 modelProducer = modelProducer,
                                 modifier = Modifier.fillMaxSize()

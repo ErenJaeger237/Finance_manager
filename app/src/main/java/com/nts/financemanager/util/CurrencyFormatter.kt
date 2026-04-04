@@ -16,4 +16,12 @@ object CurrencyFormatter {
     fun format(amount: Double): String {
         return "${formatter.format(amount)} FCFA"
     }
+
+    fun formatCompact(amount: Double): String {
+        return when {
+            amount >= 1_000_000 -> "${(amount / 1_000_000).toInt()}M"
+            amount >= 1_000 -> "${(amount / 1_000).toInt()}k"
+            else -> amount.toInt().toString()
+        }
+    }
 }

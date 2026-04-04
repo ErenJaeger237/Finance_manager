@@ -39,12 +39,12 @@ fun BudgetScreen(viewModel: BudgetViewModel) {
             )
         },
         floatingActionButton = {
-            LargeFloatingActionButton(
+            SmallFloatingActionButton(
                 onClick = { showAddDialog = true },
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Set Budget", modifier = Modifier.size(32.dp))
+                Icon(Icons.Default.Add, contentDescription = "Set Budget")
             }
         }
     ) { paddingValues ->
@@ -169,13 +169,14 @@ fun M3BudgetCard(budget: Budget, spent: Double, onDelete: () -> Unit) {
     val isWarning = ratio >= 0.8
     val isExceeded = ratio >= 1.0
 
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge,
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = if (isExceeded) MaterialTheme.colorScheme.errorContainer 
-                             else MaterialTheme.colorScheme.surface
-        )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .glassmorphic(
+                backgroundColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+                cornerRadius = 24.dp
+            )
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
             Row(

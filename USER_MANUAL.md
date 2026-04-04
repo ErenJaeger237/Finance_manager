@@ -1,104 +1,75 @@
-# 📱 Finance Manager — User Setup & Run Guide
+# Finance Manager - User Manual
 
-Welcome to the **Finance Manager** project. This guide will help you set up your local environment and run the application on your machine or Android device.
+## Prerequisites
+- JDK 21
+- Android SDK API 36+
+- Android Studio (Ladybug or newer)
+- Gradle 9.4.1 (included via wrapper)
 
----
+## Getting Started
 
-## 🛠 Prerequisites
-
-Ensure you have the following installed before proceeding:
-
-1.  **Java Development Kit (JDK):** Version **21** is required.
-2.  **Android SDK:** API Level **35** or higher.
-3.  **Android Studio (Ladybug or newer):** Recommended for the best development experience.
-4.  **Gradle:** Version **9.4.1** (Included in the project via the wrapper).
-
----
-
-## 🚀 Getting Started
-
-### 1. Clone the Repository
-```bash
+### 1. Clone and Configure
+`
 git clone <your-repository-url>
 cd Finance_manager
-```
-
-### 2. Configure Environment Variables
-The project requires a `local.properties` file in the root directory to locate your Android SDK.
-
-1. Create a file named `local.properties` in the root folder.
-2. Add the following line (adjust the path to match your actual SDK location):
-
-**Windows:**
-```properties
+`
+Create local.properties in root:
+`
 sdk.dir=C\:\\Users\\YourUsername\\AppData\\Local\\Android\\Sdk
-```
+`
 
-**macOS/Linux:**
-```properties
-sdk.dir=/Users/YourUsername/Library/Android/sdk
-```
+### 2. Build
+`
+gradle assembleDebug
+`
 
-### 3. Build the Project
-You can build the project using the command line or Android Studio.
+### 3. Run
+**Emulator:** Open in Android Studio > Device Manager > Run (Shift+F10)
+**Physical:** Enable USB Debugging > connect > gradle installDebug
 
-**Using Command Line:**
-```bash
-# On Windows
-.\gradlew build
+## App Features
 
-# On macOS/Linux
-./gradlew build
-```
+### Dashboard
+- Real-time balance overview with glassmorphic frosted-glass background
+- Inflow/Outflow summary cards with neomorphic depth effect
+- Vico bar chart with labeled Y-axis (amounts) and X-axis (categories)
+- Top spending categories breakdown
+- Manual Dark/Light mode toggle in top bar
 
----
+### Transactions
+- Add income or expenses with custom categories
+- Clean tonal surface layering (No-Line design rule)
+- Full transaction history with category icons
 
-## 📱 Running the Application
+### Budgets
+- Set monthly spending limits per category
+- Frosted-glass budget cards (glassmorphic)
+- Color-coded progress bars: Green (safe) > Orange (warning at 80%) > Red text (exceeded)
+- Compact floating action button to add new budgets
 
-### Option A: Using an Emulator (Recommended)
-1. Open the project in **Android Studio**.
-2. Go to **Device Manager** and start a Virtual Device (API 26+).
-3. Click the **Run** button (Green Play icon) or press `Shift + F10`.
+## Design System: Digital Vault
+The app uses a custom  Digital Vault theme combining:
+- **Glassmorphism:** Frosted translucent surfaces with subtle borders
+- **Neomorphism:** Soft shadow depth on interactive cards
+- **No-Line Rule:** No dividers; hierarchy via tonal surface shifts
+- **Editorial Typography:** Weighted heading hierarchy
 
-### Option B: Using a Physical Device
-1. Enable **Developer Options** and **USB Debugging** on your Android phone.
-2. Connect your phone via USB.
-3. Run the following command to install the debug version:
-   ```bash
-   .\gradlew installDebug
-   ```
+## Project Structure
+- data/ - Room Database, DAOs, Repositories
+- ui/dashboard/ - Dashboard screen and ViewModel
+- ui/transaction/ - Transaction list and add screens
+- ui/budget/ - Budget tracking screen
+- ui/theme/ - Colors, Type, Modifiers (glassmorphic/neomorphic)
+- util/ - Currency and Date formatters
 
----
+## Troubleshooting
 
-## 📊 Project Structure Overview
+| Problem | Solution |
+|---|---|
+| SDK location not found | Check local.properties path with double backslashes |
+| Incompatible Java version | Verify JDK 21 via java -version |
+| KSP version mismatch | Match KSP version to Kotlin in libs.versions.toml |
+| Chart axes missing | Need all 4 Vico imports (see BUILD_MEMORY_V2.md) |
 
--   **`app/src/main/java/.../data`**: Room Database, DAOs, and Repositories.
--   **`app/src/main/java/.../ui`**: Jetpack Compose screens, ViewModels, and Navigation.
--   **`app/src/main/java/.../util`**: Formatting utilities (Currency, Date).
--   **`ui/theme`**: Material3 design system and Olive Green palette.
-
----
-
-## 💡 Key Features to Explore
-
-1.  **Dashboard:** View your real-time balance and a Vico-powered bar chart showing expense breakdowns.
-2.  **Transactions:** Add new income or expenses with custom categories.
-3.  **Budgets:** Set monthly limits for specific categories and track progress via color-coded progress bars (Green → Orange → Red).
-
----
-
-## ❓ Troubleshooting
-
-### "SDK location not found"
-Ensure your `local.properties` file exists and the `sdk.dir` path uses double backslashes `\\` on Windows.
-
-### "Incompatible Java version"
-This project uses **JDK 21**. Verify your version by running `java -version`. In Android Studio, go to `Settings > Build, Execution, Deployment > Build Tools > Gradle` and ensure the **Gradle JDK** is set to 21.
-
-### "KSP version mismatch"
-The project uses Kotlin 2.3.0 and KSP 2.3.0. If you change the Kotlin version, you must update the KSP version in `libs.versions.toml` to match.
-
----
-
-## 📄 License
-This project is developed as part of an academic portfolio. Feel free to use and modify for learning purposes.
+## License
+Academic portfolio project. Free to use and modify for learning.
