@@ -27,15 +27,17 @@ fun AddTransactionScreen(
     viewModel: TransactionViewModel,
     onTransactionSaved: () -> Unit
 ) {
-    val categories by viewModel.listUiState.collectAsState()
+    val uiState by viewModel.listUiState.collectAsState()
     val title by viewModel.formTitle.collectAsState()
     val amount by viewModel.formAmount.collectAsState()
     val type by viewModel.formType.collectAsState()
     val category by viewModel.formCategory.collectAsState()
     val date by viewModel.formDate.collectAsState()
     val note by viewModel.formNote.collectAsState()
+    val formGoalId by viewModel.formGoalId.collectAsState()
 
     var categoryExpanded by remember { mutableStateOf(false) }
+    var goalExpanded by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
     var showAddCategoryDialog by remember { mutableStateOf(false) }
 
@@ -133,7 +135,7 @@ fun AddTransactionScreen(
                             expanded = categoryExpanded,
                             onDismissRequest = { categoryExpanded = false }
                         ) {
-                            categories.categories.forEach { cat ->
+                            uiState.categories.forEach { cat ->
                                 DropdownMenuItem(
                                     text = { Text(cat.name) },
                                     onClick = {
@@ -150,6 +152,46 @@ fun AddTransactionScreen(
                                     showAddCategoryDialog = true
                                 }
                             )
+                        }
+                    }
+
+                    // Goal selection (only for Income)
+                    if (type == TransactionType.INCOME) {
+                        ExposedDropdownMenuBox(
+                            expanded = goalExpanded,
+                            onExpandedChange = { goalExpanded = it }
+                        ) {
+                            OutlinedTextField(
+                                value = uiState.goals.find { it.id == formGoalId }?.name ?: "No Goal Linked",
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Link to Goal (Optional)") },
+                                leadingIcon = { Icon(Icons.Default.Flag, contentDescription = null) },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = goalExpanded) },
+                                modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                                shape = MaterialTheme.shapes.large
+                            )
+                            ExposedDropdownMenu(
+                                expanded = goalExpanded,
+                                onDismissRequest = { goalExpanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("None") },
+                                    onClick = {
+                                        viewModel.formGoalId.value = null
+                                        goalExpanded = false
+                                    }
+                                )
+                                uiState.goals.forEach { goal ->
+                                    DropdownMenuItem(
+                                        text = { Text(goal.name) },
+                                        onClick = {
+                                            viewModel.formGoalId.value = goal.id
+                                            goalExpanded = false
+                                        }
+                                    )
+                                }
+                            }
                         }
                     }
 

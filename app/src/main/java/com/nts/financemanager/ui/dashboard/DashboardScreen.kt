@@ -41,7 +41,8 @@ import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 fun DashboardScreen(
     viewModel: DashboardViewModel,
     isDarkMode: Boolean,
-    onThemeToggle: () -> Unit
+    onThemeToggle: () -> Unit,
+    onAddTransaction: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -100,6 +101,16 @@ fun DashboardScreen(
                         scrolledContainerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.8f)
                     )
                 )
+            },
+            floatingActionButton = {
+                LargeFloatingActionButton(
+                    onClick = onAddTransaction,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    shape = MaterialTheme.shapes.extraLarge
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add Transaction")
+                }
             }
         ) { innerPadding ->
         LazyColumn(

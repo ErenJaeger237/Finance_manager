@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 data class TransactionListUiState(
     val transactions: List<Transaction> = emptyList(),
     val categories: List<Category> = emptyList(),
+    val goals: List<com.nts.financemanager.data.model.FinancialGoal> = emptyList(),
     val selectedCategory: String? = null
 )
 
@@ -23,8 +24,9 @@ class TransactionViewModel(private val repository: FinanceRepository) : ViewMode
     val listUiState: StateFlow<TransactionListUiState> = combine(
         repository.getAllTransactions(),
         repository.getAllCategories(),
+        repository.getAllGoals(),
         _selectedCategory
-    ) { transactions, categories, selectedCat ->
+    ) { transactions, categories, goals, selectedCat ->
         val filtered = if (selectedCat != null) {
             transactions.filter { it.category == selectedCat }
         } else {
@@ -33,6 +35,7 @@ class TransactionViewModel(private val repository: FinanceRepository) : ViewMode
         TransactionListUiState(
             transactions = filtered,
             categories = categories,
+            goals = goals,
             selectedCategory = selectedCat
         )
     }.stateIn(
@@ -48,6 +51,7 @@ class TransactionViewModel(private val repository: FinanceRepository) : ViewMode
     var formCategory = MutableStateFlow("")
     var formDate = MutableStateFlow(System.currentTimeMillis())
     var formNote = MutableStateFlow("")
+    var formGoalId = MutableStateFlow<Int?>(null)
 
     fun filterByCategory(category: String?) {
         _selectedCategory.value = category
@@ -58,14 +62,15 @@ class TransactionViewModel(private val repository: FinanceRepository) : ViewMode
         if (formTitle.value.isBlank() || formCategory.value.isBlank()) return
 
         viewModelScope.launch {
-            repository.insertTransaction(
+            repository.insertTransactionWithGoalUpdate(
                 Transaction(
                     title = formTitle.value.trim(),
                     amount = amount,
                     type = formType.value,
                     category = formCategory.value,
                     date = formDate.value,
-                    note = formNote.value.trim()
+                    note = formNote.value.trim(),
+                    goalId = if (formType.value == TransactionType.INCOME) formGoalId.value else null
                 )
             )
             resetForm()
@@ -93,6 +98,7 @@ class TransactionViewModel(private val repository: FinanceRepository) : ViewMode
         formCategory.value = ""
         formDate.value = System.currentTimeMillis()
         formNote.value = ""
+        formGoalId.value = null
     }
 
     class Factory(private val repository: FinanceRepository) : ViewModelProvider.Factory {

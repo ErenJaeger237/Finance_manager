@@ -15,5 +15,6 @@ data class Transaction(
     val type: TransactionType,
     val category: String,
     val date: Long, // epoch millis
-    val note: String = ""
+    val note: String = "",
+    val goalId: Int? = null
 )
