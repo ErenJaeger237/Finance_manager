@@ -5,8 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.NightsStay
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
@@ -21,29 +22,76 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nts.financemanager.ui.theme.ExpenseRed
-import com.nts.financemanager.ui.theme.IncomeGreen
 import com.nts.financemanager.util.CurrencyFormatter
+import com.patrykandpatrick.vico.compose.cartesian.*
+import com.patrykandpatrick.vico.compose.cartesian.layer.*
+import com.nts.financemanager.ui.theme.glassmorphic
+import com.nts.financemanager.ui.theme.neomorphic
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(viewModel: DashboardViewModel) {
+fun DashboardScreen(
+    viewModel: DashboardViewModel,
+    isDarkMode: Boolean,
+    onThemeToggle: () -> Unit
+) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val modelProducer = remember { CartesianChartModelProducer() }
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            LargeTopAppBar(
-                title = { Text("Overview", fontWeight = FontWeight.Bold) },
-                scrollBehavior = scrollBehavior,
-                colors = TopAppBarDefaults.largeTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-                )
+    // Update chart data whenever expenseByCategory changes
+    LaunchedEffect(uiState.expenseByCategory) {
+        if (uiState.expenseByCategory.isNotEmpty()) {
+            modelProducer.runTransaction {
+                columnSeries {
+                    series(uiState.expenseByCategory.values)
+                }
+            }
+        }
+    }
+
+    // Wrap in Box to add background gradients for true Glassmorphism
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        // Dynamic background glows for glassmorphism refraction
+        androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize().androidx.compose.ui.draw.blur(80.dp)) {
+            val canvasWidth = size.width
+            val canvasHeight = size.height
+            drawCircle(
+                color = viewModel.uiState.value.let { MaterialTheme.colorScheme.primary.copy(alpha = 0.25f) },
+                radius = canvasWidth * 0.7f,
+                center = androidx.compose.ui.geometry.Offset(canvasWidth, 0f)
+            )
+            drawCircle(
+                color = viewModel.uiState.value.let { MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f) },
+                radius = canvasWidth * 0.6f,
+                center = androidx.compose.ui.geometry.Offset(0f, canvasHeight)
             )
         }
-    ) { innerPadding ->
+
+        Scaffold(
+            containerColor = Color.Transparent,
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                LargeTopAppBar(
+                    title = { Text("Overview", fontWeight = FontWeight.Bold) },
+                    scrollBehavior = scrollBehavior,
+                    actions = {
+                        IconButton(onClick = onThemeToggle) {
+                            Icon(
+                                imageVector = if (isDarkMode) Icons.Filled.WbSunny else Icons.Filled.NightsStay,
+                                contentDescription = "Toggle Theme"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.largeTopAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.8f)
+                    )
+                )
+            }
+        ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -81,28 +129,35 @@ fun DashboardScreen(viewModel: DashboardViewModel) {
                 }
             }
 
-            // ── 3. Expense Breakdown (M3 Style) ─────────────────────────
+            // ── 3. Visual Graph (Digital Vault Style) ─────────────────────────
             if (uiState.expenseByCategory.isNotEmpty()) {
                 item {
                     Text(
-                        text = "Spending Breakdown",
+                        text = "Spending Trends",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 8.dp, start = 4.dp)
                     )
                 }
-                
+
                 item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.extraLarge,
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(280.dp)
+                            .glassmorphic(
+                                backgroundColor = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha=0.5f),
+                                cornerRadius = 24.dp
+                            )
                     ) {
-                        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            val maxExpense = uiState.expenseByCategory.values.maxOrNull() ?: 1.0
-                            uiState.expenseByCategory.forEach { (category, amount) ->
-                                M3CategoryProgress(category, amount, maxExpense)
-                            }
+                        Box(modifier = Modifier.padding(16.dp)) {
+                            CartesianChartHost(
+                                chart = rememberCartesianChart(
+                                    rememberColumnCartesianLayer(), // Simplified for stability
+                                ),
+                                modelProducer = modelProducer,
+                                modifier = Modifier.fillMaxSize()
+                            )
                         }
                     }
                 }
@@ -127,17 +182,20 @@ fun DashboardScreen(viewModel: DashboardViewModel) {
             item { Spacer(modifier = Modifier.height(100.dp)) }
         }
     }
+    } // Close Box wrapper
 }
 
 @Composable
 private fun BalanceHero(balance: Double) {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge,
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = if (balance < 0) MaterialTheme.colorScheme.errorContainer 
-                             else MaterialTheme.colorScheme.primaryContainer
-        )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .glassmorphic(
+                backgroundColor = if (balance < 0) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f) 
+                                 else MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                borderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                cornerRadius = 28.dp
+            )
     ) {
         Column(
             modifier = Modifier
@@ -148,17 +206,14 @@ private fun BalanceHero(balance: Double) {
             Text(
                 text = "Available Balance",
                 style = MaterialTheme.typography.labelLarge,
-                color = if (balance < 0) MaterialTheme.colorScheme.onErrorContainer 
-                        else MaterialTheme.colorScheme.onPrimaryContainer
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = CurrencyFormatter.format(balance),
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 36.sp,
-                color = if (balance < 0) MaterialTheme.colorScheme.onErrorContainer 
-                        else MaterialTheme.colorScheme.onPrimaryContainer
+                style = MaterialTheme.typography.displayLarge,
+                color = if (balance < 0) MaterialTheme.colorScheme.error 
+                        else MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -173,10 +228,14 @@ private fun SmallSummaryCard(
     containerColor: Color,
     contentColor: Color
 ) {
-    Surface(
-        modifier = modifier,
-        shape = MaterialTheme.shapes.large,
-        color = containerColor
+    Box(
+        modifier = modifier
+            .neomorphic(
+                shadowColor = Color.Black.copy(alpha = 0.2f),
+                highlightColor = Color.White.copy(alpha = 0.5f),
+                cornerRadius = 20.dp
+            )
+            .background(MaterialTheme.colorScheme.background, androidx.compose.foundation.shape.RoundedCornerShape(20.dp))
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -196,6 +255,8 @@ private fun SmallSummaryCard(
         }
     }
 }
+
+// M3CategoryProgress and M3DetailedItem remain the same as they are M3 compliant.
 
 @Composable
 private fun M3CategoryProgress(category: String, amount: Double, maxAmount: Double) {

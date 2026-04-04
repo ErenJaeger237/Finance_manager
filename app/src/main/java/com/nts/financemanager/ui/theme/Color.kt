@@ -2,32 +2,32 @@ package com.nts.financemanager.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ── Primary Design System (Fintech Style) ──────────────────
-val OliveGreen = Color(0xFF6B8E23)
-val BackgroundGray = Color(0xFFF5F5F5)
-val DarkText = Color(0xFF222222)
-val SecondaryText = Color(0xFF757575)
+// ── "Digital Vault" Design System (Dark Mode First) ──────────────────
+val VaultBackground = Color(0xFF0c1324)
+val VaultSurfaceLow = Color(0xFF151b2d)
+val VaultSurfaceMedium = Color(0xFF23293c)
+val VaultSurfaceHighest = Color(0xFF2e3447)
+val VaultLowest = Color(0xFF070d1f)
+val VaultPrimary = Color(0xFF7bd0ff)
+val VaultPrimaryDark = Color(0xFF008abb) // primary_container equivalent
+val VaultOnSurface = Color(0xFFdce1fb)
+val VaultOnSurfaceVariant = Color(0xFFc6c6cd)
+val VaultOutlineVariant = Color(0xFF45464d)
+val VaultError = Color(0xFFffb4ab)
+val VaultSuccess = Color(0xFFb7c8e1)
 
-// ── Financial Accents ──────────────────────────────────────
-val IncomeGreen = Color(0xFF43A047)
-val ExpenseRed = Color(0xFFE53935)
-val WarningOrange = Color(0xFFFB8C00)
+// ── Adapted "Digital Vault" (Light Mode) ──────────────────
+// Maintaining the same hue but inverting luminance for a clean 'Daylight Vault' feel.
+val LightVaultBackground = Color(0xFFf8fbff)
+val LightVaultSurfaceLow = Color(0xFFeef3fd)
+val LightVaultSurfaceMedium = Color(0xFFe4ebf7)
+val LightVaultSurfaceHighest = Color(0xFFdae3f3)
+val LightVaultLowest = Color(0xFFffffff)
+val LightVaultPrimary = Color(0xFF00668a)
+val LightVaultPrimaryLight = Color(0xFF7bd0ff)
+val LightVaultOnSurface = Color(0xFF0c1324)
+val LightVaultOnSurfaceVariant = Color(0xFF45464d)
+val LightVaultOutlineVariant = Color(0xFFc6c6cd)
+val LightVaultError = Color(0xFFba1a1a)
+val LightVaultSuccess = Color(0xFF3a4a5f)
 
-// ── Material 3 Color Scheme Mapping ────────────────────────
-val LightPrimary = OliveGreen
-val LightOnPrimary = Color.White
-val LightPrimaryContainer = Color(0xFFE8F5E9)
-val LightOnPrimaryContainer = Color(0xFF2E7D32)
-
-val LightSecondary = Color(0xFF57624A)
-val LightBackground = BackgroundGray
-val LightSurface = Color.White
-val LightOnSurface = DarkText
-val LightSurfaceVariant = Color(0xFFEEEEEE)
-val LightError = ExpenseRed
-
-// ── Dark Theme (Muted for Eye Comfort) ─────────────────────
-val DarkBackground = Color(0xFF121212)
-val DarkSurface = Color(0xFF1E1E1E)
-val DarkOnSurface = Color(0xFFE0E0E0)
-val DarkPrimary = Color(0xFFB5D46E)

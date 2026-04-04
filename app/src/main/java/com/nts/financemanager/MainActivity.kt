@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModelProvider
 import com.nts.financemanager.ui.budget.BudgetViewModel
 import com.nts.financemanager.ui.dashboard.DashboardViewModel
@@ -19,24 +20,20 @@ class MainActivity : ComponentActivity() {
         val app = application as FinanceApplication
         val repo = app.repository
 
-        val dashboardViewModel = ViewModelProvider(
-            this, DashboardViewModel.Factory(repo)
-        )[DashboardViewModel::class.java]
-
-        val transactionViewModel = ViewModelProvider(
-            this, TransactionViewModel.Factory(repo)
-        )[TransactionViewModel::class.java]
-
-        val budgetViewModel = ViewModelProvider(
-            this, BudgetViewModel.Factory(repo)
-        )[BudgetViewModel::class.java]
+        val dashboardViewModel = ViewModelProvider(this, DashboardViewModel.Factory(repo))[DashboardViewModel::class.java]
+        val transactionViewModel = ViewModelProvider(this, TransactionViewModel.Factory(repo))[TransactionViewModel::class.java]
+        val budgetViewModel = ViewModelProvider(this, BudgetViewModel.Factory(repo))[BudgetViewModel::class.java]
 
         setContent {
-            FinanceManagerTheme {
+            var isDarkMode by remember { mutableStateOf(false) }
+            
+            FinanceManagerTheme(darkTheme = isDarkMode) {
                 FinanceNavHost(
                     dashboardViewModel = dashboardViewModel,
                     transactionViewModel = transactionViewModel,
-                    budgetViewModel = budgetViewModel
+                    budgetViewModel = budgetViewModel,
+                    isDarkMode = isDarkMode,
+                    onThemeToggle = { isDarkMode = !isDarkMode }
                 )
             }
         }

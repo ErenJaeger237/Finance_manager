@@ -10,7 +10,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,7 +43,9 @@ private val bottomNavItems = listOf(
 fun FinanceNavHost(
     dashboardViewModel: DashboardViewModel,
     transactionViewModel: TransactionViewModel,
-    budgetViewModel: BudgetViewModel
+    budgetViewModel: BudgetViewModel,
+    isDarkMode: Boolean,
+    onThemeToggle: () -> Unit
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -52,36 +53,14 @@ fun FinanceNavHost(
 
     Scaffold(
         bottomBar = {
-            NavigationBar(
-                containerColor = Color.White,
-                tonalElevation = 8.dp
-            ) {
+            NavigationBar(tonalElevation = 3.dp) {
                 bottomNavItems.forEach { screen ->
                     val selected = currentRoute == screen.route
                     NavigationBarItem(
-                        icon = { 
-                            Icon(
-                                imageVector = screen.icon, 
-                                contentDescription = screen.label,
-                                modifier = Modifier.size(26.dp)
-                            ) 
-                        },
-                        label = { 
-                            Text(
-                                screen.label,
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
-                            ) 
-                        },
+                        icon = { Icon(screen.icon, contentDescription = screen.label, modifier = Modifier.size(26.dp)) },
+                        label = { Text(screen.label, style = MaterialTheme.typography.labelSmall, fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium) },
                         selected = selected,
                         alwaysShowLabel = true,
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = MaterialTheme.colorScheme.primary,
-                            selectedTextColor = MaterialTheme.colorScheme.primary,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                            indicatorColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-                        ),
                         onClick = {
                             if (currentRoute != screen.route) {
                                 navController.navigate(screen.route) {
@@ -102,7 +81,11 @@ fun FinanceNavHost(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Dashboard.route) {
-                DashboardScreen(viewModel = dashboardViewModel)
+                DashboardScreen(
+                    viewModel = dashboardViewModel,
+                    isDarkMode = isDarkMode,
+                    onThemeToggle = onThemeToggle
+                )
             }
             composable(Screen.AddTransaction.route) {
                 AddTransactionScreen(

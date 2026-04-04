@@ -20,9 +20,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nts.financemanager.data.model.Budget
-import com.nts.financemanager.ui.theme.ExpenseRed
-import com.nts.financemanager.ui.theme.IncomeGreen
-import com.nts.financemanager.ui.theme.WarningOrange
+import com.nts.financemanager.ui.theme.*
 import com.nts.financemanager.util.CurrencyFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -33,6 +33,8 @@ Thumbs.db
 implementation_plan.md
 CLAUDE.md
 BUILD_MEMORY.md
+BUILD_MEMORY_V2.md
+build_out.txt
 
 # Log files
 *.log

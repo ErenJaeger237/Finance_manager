@@ -18,8 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.nts.financemanager.data.model.Transaction
 import com.nts.financemanager.data.model.TransactionType
-import com.nts.financemanager.ui.theme.ExpenseRed
-import com.nts.financemanager.ui.theme.IncomeGreen
+import com.nts.financemanager.ui.theme.*
 import com.nts.financemanager.util.CurrencyFormatter
 import java.text.SimpleDateFormat
 import java.util.*
@@ -89,15 +88,14 @@ fun TransactionListScreen(viewModel: TransactionViewModel) {
                 grouped.forEach { (date, transactions) ->
                     item {
                         Surface(
-                            color = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
-                            modifier = Modifier.fillMaxWidth()
+                            color = Color.Transparent,
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp)
                         ) {
                             Text(
                                 text = date,
                                 style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = 16.dp)
                             )
                         }
                     }
@@ -107,11 +105,7 @@ fun TransactionListScreen(viewModel: TransactionViewModel) {
                             transaction = transaction,
                             onDelete = { viewModel.deleteTransaction(transaction) }
                         )
-                        HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            thickness = 0.5.dp,
-                            color = MaterialTheme.colorScheme.outlineVariant
-                        )
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }
@@ -132,6 +126,9 @@ fun M3TransactionListItem(transaction: Transaction, onDelete: () -> Unit) {
     }
 
     ListItem(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .clip(MaterialTheme.shapes.large),
         headlineContent = { Text(transaction.title, fontWeight = FontWeight.Bold) },
         supportingContent = { Text(transaction.category) },
         trailingContent = {
@@ -152,11 +149,14 @@ fun M3TransactionListItem(transaction: Transaction, onDelete: () -> Unit) {
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
             }
-        }
+        },
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        )
     )
 }
