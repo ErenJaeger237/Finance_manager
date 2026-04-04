@@ -1,0 +1,55 @@
+# Plan: Goal-Transaction Sync & User-Defined Deadlines
+
+Integrate the "Saving Goals" feature deeper into the core finance ledger so that every "Save" action is a traceable transaction.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Refined Deduction Logic:**
+> - When you **Add Funds** via the Goals screen, I will create an **EXPENSE** transaction. This will deduct the amount from your total balance and show up in your "History".
+> - I will use the category **"Savings"** for these transactions by default. Does that work for you?
+
+---
+
+## Proposed Changes
+
+### 1. Data Layer (Ledger Sync)
+
+#### [MODIFY] [FinanceRepository.kt](file:///c:/Users/NTS/Documents/Finance_manager/app/src/main/java/com/nts/financemanager/data/repository/FinanceRepository.kt)
+Update `insertTransactionWithGoalUpdate` to:
+- Increment `savedAmount` for both `INCOME` and `EXPENSE` when a `goalId` is present.
+- (An `EXPENSE` with a `goalId` represents "moving" money into that goal).
+
+### 2. ViewModel Logic
+
+#### [MODIFY] [GoalsViewModel.kt](file:///c:/Users/NTS/Documents/Finance_manager/app/src/main/java/com/nts/financemanager/ui/goals/GoalsViewModel.kt)
+Update `addFunds(goal, amount)`:
+- Instead of updating the goal directly, it will now call `repository.insertTransactionWithGoalUpdate()`.
+- It will create a `Transaction` of type `EXPENSE`, category "Savings", titled "Funded: ${goal.name}".
+
+### 3. UI Refinements (DatePicker & UX)
+
+#### [MODIFY] [GoalsScreen.kt](file:///c:/Users/NTS/Documents/Finance_manager/app/src/main/java/com/nts/financemanager/ui/goals/GoalsScreen.kt)
+- **GoalAddDialog:** Implement a real **Material 3 DatePicker** (using `rememberDatePickerState`) to replaces the "6 months default" logic.
+- Ensure the selected deadline is passed correctly to the `addGoal` function.
+
+---
+
+## Open Questions
+
+> [!QUESTION]
+> Should the "Goal Contribution" transaction also be editable from the History screen, or should it be "locked" to the goal? I recommend making it editable like any other transaction.
+
+---
+
+## Verification Plan
+
+### Automated Verification
+- Run `gradle assembleDebug` to ensure no build errors after adding the DatePicker (M3 APIs can be tricky).
+
+### Manual Verification
+1. Create a goal and select a specific date in the future using the new DatePicker.
+2. Use "Add Funds" to add 50,000 FCFA.
+3. Verify that the **Total Balance** on the Dashboard has decreased by 50,000.
+4. Verify that the **Transaction History** shows "Funded: [Goal Name]" as an expense.
+5. Verify that the **Goal Progress Bar** has advanced correctly.

@@ -35,9 +35,11 @@ class FinanceRepository(
     
     suspend fun insertTransactionWithGoalUpdate(transaction: Transaction) {
         transactionDao.insert(transaction)
-        if (transaction.goalId != null && transaction.type == com.nts.financemanager.data.model.TransactionType.INCOME) {
+        if (transaction.goalId != null) {
             val goal = financialGoalDao.getGoalById(transaction.goalId)
             if (goal != null) {
+                // Both income (direct deposit) and expense (allocation from balance) 
+                // increase the goal's saved amount.
                 financialGoalDao.update(goal.copy(savedAmount = goal.savedAmount + transaction.amount))
             }
         }

@@ -32,7 +32,16 @@ class GoalsViewModel(private val repository: FinanceRepository) : ViewModel() {
 
     fun addFunds(goal: FinancialGoal, amount: Double) {
         viewModelScope.launch {
-            repository.updateGoal(goal.copy(savedAmount = goal.savedAmount + amount))
+            repository.insertTransactionWithGoalUpdate(
+                com.nts.financemanager.data.model.Transaction(
+                    title = "Saved for ${goal.name}",
+                    amount = amount,
+                    type = com.nts.financemanager.data.model.TransactionType.EXPENSE,
+                    category = "Savings",
+                    date = System.currentTimeMillis(),
+                    goalId = goal.id
+                )
+            )
         }
     }
 

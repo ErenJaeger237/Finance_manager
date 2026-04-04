@@ -216,15 +216,17 @@ fun GoalCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GoalAddDialog(onDismiss: () -> Unit, onConfirm: (String, Double, Long) -> Unit) {
     var name by remember { mutableStateOf("") }
     var targetAmount by remember { mutableStateOf("") }
+    var showDatePicker by remember { mutableStateOf(false) }
     
-    // Simple date picker placeholder - in a real app use DatePicker
-    val calendar = Calendar.getInstance()
-    calendar.add(Calendar.MONTH, 6) // Default 6 months from now
-    var deadline by remember { mutableLongStateOf(calendar.timeInMillis) }
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = Calendar.getInstance().apply { add(Calendar.MONTH, 6) }.timeInMillis
+    )
+    val deadline = datePickerState.selectedDateMillis ?: System.currentTimeMillis()
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -249,15 +251,29 @@ fun GoalAddDialog(onDismiss: () -> Unit, onConfirm: (String, Double, Long) -> Un
                     shape = MaterialTheme.shapes.large,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Text(
-                    text = "Deadline: ${SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(Date(deadline))}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = "(Currently defaulting to 6 months from now)",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                
+                Surface(
+                    onClick = { showDatePicker = true },
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                    shape = MaterialTheme.shapes.large,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.Event, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text("Deadline", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                text = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(Date(deadline)),
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                }
             }
         },
         confirmButton = {
@@ -275,4 +291,18 @@ fun GoalAddDialog(onDismiss: () -> Unit, onConfirm: (String, Double, Long) -> Un
             TextButton(onClick = onDismiss) { Text("Cancel") }
         }
     )
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = { showDatePicker = false }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) { Text("Cancel") }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
 }
